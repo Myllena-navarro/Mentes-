@@ -1,4 +1,4 @@
-# Mentes³
+# Mentes³ 🧠
 
 CESAR School | Programação Imperativa e Funcional - 2024.2
 
