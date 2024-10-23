@@ -1,5 +1,5 @@
 # Mentes³
-### Programação Imperativa e Funcional - 2024.2 | CESAR School
+### CESAR School | Programação Imperativa e Funcional - 2024.2
 
 ## Descrição
 Olá, mundo!
