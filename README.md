@@ -1,2 +1,2 @@
-# Mentes³
-Estudantes: 
+## Mentes³
+Olá, mundo!
