@@ -1,10 +1,3 @@
-/**
- * screen.c
- * Created on Aug, 23th 2023
- * Author: Tiago Barros
- * Based on "From C to C++ course - 2002"
-*/
-
 #include "screen.h"
 
 void screenDrawBorders() 
@@ -58,7 +51,7 @@ void screenInit(int drawBorders)
 
 void screenDestroy()
 {
-    printf("%s[0;39;49m", ESC); // Reset colors
+    printf("%s[0;39;49m", ESC); 
     screenSetNormal();
     screenClear();
     screenHomeCursor();
@@ -84,4 +77,95 @@ void screenSetColor( screenColor fg, screenColor bg)
     }
 
     printf("%s%s%d;%dm", ESC, atr, fg+30, bg+40);
+}
+
+void screenShowTime(int time) {
+    char timeMessage[20];
+    sprintf(timeMessage, "Tempo restante: %d segundos", time);
+
+    int msgLen = strlen(timeMessage);
+
+    int msgX = (MAXX - msgLen) / 2;
+    int msgY = MAXY - 2;
+    screenGotoxy(centerX, centerY);
+
+    printf("%s", timeMessage);
+}
+
+
+void screenWelcome() {
+    char welcomeMessage[] = "Bem-vindo ao jogo da Forca!!";
+    int msgLen = strlen(welcomeMessage);
+    
+    int msgX = (MAXX - msgLen) / 2;
+    int msgY = MAXY / 2;
+    
+    screenGotoxy(msgX, msgY);
+    printf("%s", welcomeMessage);
+}
+
+void screenDrawHangman(int errors) {
+    char hangman[] = 
+        "  ________\n"
+        "  |      |\n"
+        "  |      %c%c%c\n"
+        "  |      %c%c%c\n"
+        "  |      %c\n"
+        "  |      %c%c\n"
+        "  |          \n"
+        " _|___       \n";
+
+    printf(hangman, 
+           (errors >= 1 ? '(' : ' '), 
+           (errors >= 1 ? '_' : ' '), 
+           (errors >= 1 ? ')' : ' '),
+           (errors >= 3 ? '\\' : ' '), 
+           (errors >= 2 ? '|' : ' '), 
+           (errors >= 3 ? '/' : ' '), 
+           (errors >= 2 ? '|' : ' '), 
+           (errors >= 4 ? '/' : ' '), 
+           (errors > 4 ? '\\' : ' '));
+}
+
+void screenDrawTrophy() {
+    char trophyMessage[] = "Parabéns, você acertou a palavra!";
+    char trophy[] = 
+        "     ___________   \n"
+        "    '._==_==_=_.'  \n"
+        "    .-\\:      /-. \n"
+        "   | (|:.     |) | \n"
+        "    '-|:.     |-'  \n"  
+        "      \\::.    /   \n"
+        "       '::. .'     \n"
+        "         ) (       \n"  
+        "       _.' '._     \n"
+        "       '-----'     \n\n"; 
+
+    printf("%s\n", trophyMessage);
+    printf("%s", trophy);
+}
+
+void screenDrawGameOver() {
+    char gameOverMessage[] = "Você perdeu! A palavra era: ";
+    char hangman[] = 
+        "   _______________         \n"
+        "  /               \\       \n"
+        " /                  \\     \n"
+        "//                   \\    \n"
+        " |   XXXX     XXXX   | /   \n"
+        " |   XXXX     XXXX   |/    \n"
+        " |    XXX     XXX    |     \n"
+        " |                   |     \n"
+        " \\__     XXX     __/      \n"
+        "   |\\    XXX     /|       \n"
+        "   | |           | |       \n"
+        "   | I I I I I I I |       \n"   
+        "   |  I I I I I I  |       \n"
+        "   \\_            _/       \n"
+        "     \\_         _/        \n"
+        "       \\_______/          \n";
+
+    printf("%s%s\n", gameOverMessage);
+
+    printf("%s", hangman);
 }
