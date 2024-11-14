@@ -35,14 +35,14 @@ Para compilar o código, você precisa usar um compilador C, como gcc. Siga esse
 1. Navegue até o diretório onde os arquivos estão localizados.
 2. Execute o comando abaixo para compilar todos os arquivos:
    bash
-   gcc Main.c Keyboard.c Screen.c Timer.c -o jogo_forca
+   gcc Main.c Keyboard.c Screen.c Timer.c -o main
    
-   Esse comando compila cada arquivo .c e gera um executável chamado jogo_forca.
+   Esse comando compila cada arquivo .c e gera um executável chamado main.
 
 3. Execução
 Depois de compilar, você pode executar o jogo com o seguinte comando:
 bash
-./jogo_forca
+./main
 
 
 4. Implementação e Mecânica do Jogo
