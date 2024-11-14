@@ -17,7 +17,57 @@ Mentes³ é um jogo da forca que desafia seu raciocínio lógico ao mesmo tempo 
 - Se o corpo for completamente desenhado, você perde o jogo.
 
 ## Procedimentos (compilação | execução)
-_(em processo de definição)_
+Para compilar e executar esse jogo de forca em C, você precisará seguir alguns procedimentos específicos, que incluem a configuração do ambiente de desenvolvimento e o entendimento das funções de cada arquivo.
+
+1. Estrutura do Código e Arquivos
+O código está dividido em vários arquivos .h e .c que juntos implementam a mecânica do jogo:
+
+- *Keyboard.h e Keyboard.c*: Controlam a captura de entrada do teclado.
+- *Screen.h e Screen.c*: Gerenciam a exibição de elementos na tela, incluindo desenhos de bordas, cursor e cores.
+- *Timer.h e Timer.c*: Controlam o temporizador do jogo.
+- *Main.c*: Gerencia a lógica principal do jogo, incluindo inicialização, controle de tentativas, exibição da palavra e gerenciamento da pontuação.
+
+Cada arquivo .h é um "header" que declara funções e macros, enquanto os arquivos .c implementam as funções.
+
+2. Compilação
+Para compilar o código, você precisa usar um compilador C, como gcc. Siga esses passos:
+
+1. Navegue até o diretório onde os arquivos estão localizados.
+2. Execute o comando abaixo para compilar todos os arquivos:
+   bash
+   gcc Main.c Keyboard.c Screen.c Timer.c -o jogo_forca
+   
+   Esse comando compila cada arquivo .c e gera um executável chamado jogo_forca.
+
+3. Execução
+Depois de compilar, você pode executar o jogo com o seguinte comando:
+bash
+./jogo_forca
+
+
+4. Implementação e Mecânica do Jogo
+Abaixo, explico a mecânica de cada parte do jogo, desde a entrada de dados até a atualização da tela e controle do tempo.
+
+- *Entrada do Teclado* (Keyboard.c): A função keyhit() verifica se uma tecla foi pressionada, e get_input() captura o caractere pressionado. Elas usam configurações do terminal para evitar a exibição do caractere e o modo "canônico".
+
+- *Exibição e Controle de Tela* (Screen.c): 
+  - O código usa sequências de escape ANSI (definidas em Screen.h) para controlar a tela e aplicar cores.
+  - A função screenDrawBorders() desenha as bordas da área de jogo.
+  - screenForca() desenha o "boneco da forca" dependendo do número de erros.
+  - screenTrofeu() e screenCaveira() mostram mensagens de vitória ou derrota.
+
+- *Temporizador* (Timer.c): 
+  - A função timerInit() inicia o tempo máximo do jogo.
+  - timerTimeOver() verifica se o tempo acabou, comparando o tempo atual com o tempo inicial.
+
+- *Lógica do Jogo* (Main.c): 
+  - A função initializeForca() inicializa a estrutura Forca, configurando o nome do jogador, a palavra secreta e as tentativas.
+  - Durante o jogo, showPalavra_secreta() exibe a palavra oculta com as letras descobertas.
+  - showLetra_certa() verifica se a letra escolhida está na palavra e atualiza o estado do jogo.
+  - checkVictory() verifica se o jogador acertou toda a palavra.
+  - showgameOver() exibe uma mensagem final caso o jogador perca.
+
+Esse conjunto de funções cria uma interação básica de um jogo de forca, permitindo que o jogador tente adivinhar uma palavra dentro de um número limitado de tentativas e tempo, com feedback visual na tela.
 
 ## Observações
 - Este jogo funciona por meio do terminal.
