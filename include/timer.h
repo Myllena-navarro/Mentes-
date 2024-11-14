@@ -1,9 +1,10 @@
-void timerInit(int valueMilliSec);
+#ifndef TIMER_H
+#define TIMER_H
 
-void timerDestroy();
+#include <time.h>
 
-void timerUpdateTimer(int valueMilliSec);
+void timerInit(int tempoMax);
+int timerTimeOver(void);
 
-int timerTimeOver();
+#endif
 
-void timerPrint();
