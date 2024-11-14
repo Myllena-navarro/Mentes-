@@ -1,119 +1,192 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
 #include "keyboard.h"
 #include "screen.h"
 #include "timer.h"
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
 
-int x = 34, y = 12;
-int incX = 1, incY = 1;
-int pontos = 0;
-float tempoTotal =0;
+struct Forca {
+    char name[MAX_JOGADOR];
+    int pontuacao;
+    int erros;
+    char palavra_secreta[20];
+    char letra_certa[20];
+    float tempo;
+};
 
+void initializeForca(struct Forca *forca);
+void showPalavra_secreta(struct Forca *forca);
+void showPontuacao(struct Forca *forca);
+void showLetra_certa(struct Forca *forca, char letra_certa);
+void showgameOver(struct Forca *forca);
+int checkVictory(struct Forca *forca);
+void savePontuacao(struct Forca *forca);
+int getRandomPalavra_secreta(char *palavra_secreta);
+void bemVindo(struct Forca *forca);
+int keyhit(void);
 
-void printKey(int ch) {
-  screenSetColor(YELLOW, DARKGRAY);
-  screenGotoxy(35, 22);
-  printf("Key code :");
+int main() {
+    struct Forca *forca = (struct Forca *)malloc(sizeof(struct Forca));
+    if (forca == NULL) {
+        printf("Erro ao alocar memoria para a estrutura Forca.\n");
+        return 1;
+    }
 
-  screenGotoxy(34, 23);
-  printf("            ");
+    srand(time(NULL));
+    timerInit(150); 
+    screenUpdate(forca->erros);
 
-  if (ch == 27)
-    screenGotoxy(36, 23);
-  else
-    screenGotoxy(39, 23);
+    initializeForca(forca);
 
-  printf("%d ", ch);
-  while (keyhit()) {
-    printf("%d ", readch());
-  }
-}
+    char ch = 0;
+    while (forca->erros < MAX_TENTATIVAS && !timerTimeOver()) {
+        screenClear();
+        screenForca(forca->erros); 
+        screenClear();
 
-void jogarForca(char* palavra, char* dica) {
-    int tentativas = 6, acertos = 0;
-    int tempoIniciado = time(NULL); // Iniciar o tempo
-    char* palavraDescoberta = (char*)malloc(strlen(palavra) + 1); // Alocação dinâmica
-    for (int i = 0; i < strlen(palavra); i++) palavraDescoberta[i] = '_';
-    palavraDescoberta[strlen(palavra)] = '\0';
+        showPalavra_secreta(forca);
+        showPontuacao(forca);
+        screenUpdate(forca->erros);
+        if (keyhit()) {
+            ch = get_input();
 
-    printf("\nDica: %s\n", dica);
-    printf("Palavra: %s\n", palavraDescoberta);
-
-    while (tentativas > 0) {
-        char letra;
-        printf("\nDigite uma letra: ");
-        scanf(" %c", &letra);
-
-        int acertou = 0;
-        for (int i = 0; i < strlen(palavra); i++) {
-            if (palavra[i] == letra && palavraDescoberta[i] == '_') {
-                palavraDescoberta[i] = letra;
-                acertou = 1;
-                acertos++;
+            if (ch >= 'a' && ch <= 'z') {
+                showLetra_certa(forca, ch);
+                screenUpdate(forca->erros); 
             }
         }
 
-        if (!acertou) {
-            tentativas--;
-            screenDrawHangman(6 - tentativas);
+        if (checkVictory(forca)) {
+            screenClear();
+            screenTrofeu();
+            printf("Você acertou a palavra! Parabéns, %s!\n", forca->name);
+            break;
         }
 
-        printf("Palavra: %s\n", palavraDescoberta);
+        screenUpdate(forca->erros); 
+    }
 
-        if (acertos == strlen(palavra)) {
-            printf("Você acertou a palavra!\n");
-            pontos += 5;
-            screenDrawTrophy();
+    showgameOver(forca);
+    free(forca);
+
+    return 0;
+}
+
+void initializeForca(struct Forca *forca) {
+    int centerX = (MAXX - MINX) / 2 + MINX;
+    int topY = MINY + 2;
+    screenSetColor(LIGHTGREEN, DARKGRAY);
+
+    screenGotoxy(centerX - 10, topY); 
+    printf("Bem-vindo ao Mentes³!!");
+    screenGotoxy(centerX - 10, topY + 1);
+    printf("Vamos brincar de forca?");
+    screenGotoxy(centerX - 10, topY + 2);
+    printf("Nome do Jogador: ");
+
+    if (fgets(forca->name, MAX_JOGADOR, stdin) != NULL) {
+        forca->name[strcspn(forca->name, "\n")] = '\0';
+    } else {
+        printf("Erro ao ler o nome do jogador. Usando nome padrão.\n");
+        strcpy(forca->name, "Fulano");
+    }
+
+    forca->pontuacao = 0;
+    forca->erros = 0;
+    getRandomPalavra_secreta(forca->palavra_secreta);
+    memset(forca->letra_certa, '_', sizeof(forca->letra_certa));
+    forca->letra_certa[strlen(forca->palavra_secreta)] = '\0';
+    forca->tempo = 0;
+
+    screenUpdate(forca->erros);
+}
+
+void showPalavra_secreta(struct Forca *forca) {
+    screenSetColor(CYAN, DARKGRAY);
+    printf("Palavra: ");
+    for (int i = 0; i < strlen(forca->palavra_secreta); i++) {
+        printf("%c ", forca->letra_certa[i]);
+    }
+    printf("\n");
+}
+
+void showPontuacao(struct Forca *forca) {
+    screenSetColor(YELLOW, DARKGRAY);
+    printf("Pontuação: %d\n", forca->pontuacao);
+    printf("Tentativas restantes: %d\n", MAX_TENTATIVAS - forca->erros);
+}
+
+void showLetra_certa(struct Forca *forca, char letra_certa) { 
+    int correctLetra_certa = 0;
+    int letraJaTentada = 0;
+
+    for (int i = 0; i < strlen(forca->letra_certa); i++) {
+        if (forca->letra_certa[i] == letra_certa) {
+            letraJaTentada = 1;
             break;
         }
     }
 
-    if (tentativas == 0) {
-        screenDrawGameOver(palavra);
-        pontos -= 3;
+    if (letraJaTentada) {
+        printf("Você já tentou essa letra! Tente outra.\n");
+        return;
     }
 
-    int tempoFinal = time(NULL) - tempoIniciado;
-    tempoTotal += tempoFinal;
-    free(palavraDescoberta);
+    for (int i = 0; i < strlen(forca->palavra_secreta); i++) {
+        if (forca->palavra_secreta[i] == letra_certa) { 
+            forca->letra_certa[i] = letra_certa;
+            correctLetra_certa = 1;
+        }
+    }
+
+    if (correctLetra_certa) {
+        screenSetColor(LIGHTGREEN, DARKGRAY);
+        forca->pontuacao += 5;
+    } else {
+        screenSetColor(LIGHTRED, DARKGRAY);
+        forca->pontuacao -= 3;
+        forca->erros++;
+        forca->tempo++;
+    }
 }
 
-void salvarResultado(char* nome, int pontos, int tempoTotal) {
-    FILE* file = fopen("resultados.txt", "a");
+int checkVictory(struct Forca *forca) {
+    for (int i = 0; i < strlen(forca->palavra_secreta); i++) {
+        if (forca->letra_certa[i] == ('_')) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void showgameOver(struct Forca *forca) {
+    if (forca->erros >= MAX_TENTATIVAS) {
+        screenClear();
+        screenCaveira();
+        printf("Você perdeu, tente novamente!\n");
+    }
+
+    printf("Seu tempo: %f segundos\n", forca->tempo);
+    printf("Pontuação final: %d\n", forca->pontuacao);
+    savePontuacao(forca);
+}
+
+void savePontuacao(struct Forca *forca) {
+    FILE *file = fopen("highscores.txt", "a+");
     if (file != NULL) {
-        fprintf(file, "Nome: %s, Pontos: %d, Tempo: %d segundos\n", nome, pontos, tempoTotal);
+        fprintf(file, "Nome: %s | Pontuação: %d | Tempo: %.2f\n", forca->name, forca->pontuacao, forca->tempo);
         fclose(file);
     } else {
-        printf("Erro ao salvar o resultado.\n");
+        printf("Erro ao salvar a pontuação.\n");
     }
 }
 
-int main() {
-  char nome[50];
-  static int ch = 0;
-
-  screenInit(1);
-  keyboardInit();
-  timerInit(50);
-
-  printf("Digite seu nome: ");
-  fgets(nome, sizeof(nome), stdin);
-  nome[strcspn(nome, "\n")] = '\0';
-
-  char* palavras[] = {"laranja", "abacaxi", "melancia"};
-  char* dicas[] = {"fruta", "fruta", "fruta"};
-
-  for (int i = 0; i < 3; i++) {
-      jogarForca(palavras[i], dicas[i]);
-      screenUpdate();  
-  }
-
-   salvarResultado(nome, pontos, tempoTotal);
-
-  keyboardDestroy();
-  screenDestroy();
-  timerDestroy();
-
-  return 0;
+int getRandomPalavra_secreta(char *palavras_secreta) {
+    const char *palavras_secretas[] = {"programacao", "forca", "jogo", "desenvolvimento", "computador"};
+    srand(time(NULL));
+    int index = rand() % 5;
+    strcpy(palavras_secreta,palavras_secretas[index]);
+    return index;
 }
