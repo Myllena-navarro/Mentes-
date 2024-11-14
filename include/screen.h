@@ -3,122 +3,66 @@
 
 #include <stdio.h>
 
-#define ESC            "\033"
-#define NORMALTEXT     "[0m"
-#define BOLDTEXT       "[1m"
-#define ITALICTEXT     "[3m"
-#define BLINKTEXT      "[5m"
-#define REVERSETEXT    "[7m"
-#define HOMECURSOR     "[f"
-#define SHOWCURSOR     "[?25h"
-#define HIDECURSOR     "[?25l"
-#define CLEARSCREEN    "[2J"
+#define ESC "\033"
+#define NORMALTEXT "[0m"
+#define BOLDTEXT "[1m"
+#define BLINKTEXT "[5m"
+#define SHOWCURSOR "[?25h"
+#define HIDECURSOR "[?25l"
+#define CLEARSCREEN "[2J"
+#define BOX_ENABLE "(0"
+#define BOX_DISABLE "(B"
+#define BOX_VLINE 0x78
+#define BOX_HLINE 0x71
+#define BOX_UPLEFT 0x6C
+#define BOX_UPRIGHT 0x6B
+#define BOX_DWNLEFT 0x6D
+#define BOX_DWNRIGHT 0x6A
+#define BOX_TLEFT 0X74
+#define BOX_TRIGHT 0X75
+#define BOX_TUP 0X77
+#define BOX_TDOWN 0X76
 
-#define BOX_ENABLE     "(0"
-#define BOX_DISABLE    "(B"
-#define BOX_VLINE      0x78
-#define BOX_HLINE      0x71
-#define BOX_UPLEFT     0x6C
-#define BOX_UPRIGHT    0x6B
-#define BOX_DWNLEFT    0x6D
-#define BOX_DWNRIGHT   0x6A
-#define BOX_CROSS      0x6E
-#define BOX_TLEFT      0X74
-#define BOX_TRIGHT     0X75
-#define BOX_TUP        0X77
-#define BOX_TDOWN      0X76
+#define MINX 0
+#define MINY 0
+#define MAXX 50
+#define MAXY 30
 
-#define BOX_DIAMOND    0x60
-#define BOX_BLOCK      0x61
-#define BOX_DOT        0x7E
+#define FORCA_X 10
+#define FORCA_Y 5
+#define GANHAR_TROFEU_X 30
+#define GANHAR_TROFEU_Y 10
+#define PERDER_CAVEIRA_X 20
+#define PERDER_CAVEIRA_Y 10
 
-#define SCRSTARTX      3      // Initial and final screen positions for the game
-#define SCRENDX        75     // It means the area that can be drawn 
-#define SCRSTARTY      1
-#define SCRENDY        23
+#define MAX_JOGADOR 10
+#define MAX_TENTATIVAS 6
 
-#define MINX           1      // min screen horizontal pos
-#define MINY           1      // min screen vertical pos
-#define MAXX           80     // max screen horizontal pos
-#define MAXY           24     // max screen vertical pos
+typedef enum {
+  BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,
+  DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, LIGHTMAGENTA,
+  LIGHTCYAN, WHITE
+} screenColor;
 
-typedef enum {BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,
-        DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, 
-        LIGHTMAGENTA, LIGHTCYAN, WHITE} screenColor; 
+static inline void screenShowCursor() { printf("%s%s", ESC, SHOWCURSOR); }
+static inline void screenClear() { screenShowCursor(); printf("%s%s", ESC, CLEARSCREEN); }
+static inline void screenSetNormal() { printf("%s%s", ESC, NORMALTEXT); }
+static inline void screenSetBold() { printf("%s%s", ESC, BOLDTEXT); }
+static inline void screenSetBlink() { printf("%s%s", ESC, BLINKTEXT); }
+static inline void screenBoxEnable() { printf("%s%s", ESC, BOX_ENABLE); }
 
-
-static inline void screenHomeCursor()
-{
-    printf("%s%s", ESC, HOMECURSOR);
-}
-
-
-static inline void screenShowCursor()
-{
-    printf("%s%s", ESC, SHOWCURSOR);
-}
-
-
-static inline void screenHideCursor()
-{
-    printf("%s%s", ESC, HIDECURSOR);
-}
-
-
-static inline void screenClear()
-{
-    screenHomeCursor();
-    printf("%s%s", ESC, CLEARSCREEN);
-}
-
-
-static inline void screenUpdate() {
-    fflush(stdout);
-}
-
-
-static inline void screenSetNormal()
-{
-    printf("%s%s", ESC, NORMALTEXT);
-}
-
-
-static inline void screenSetBold()
-{
-    printf("%s%s", ESC, BOLDTEXT);
-}
-
-
-static inline void screenSetBlink()
-{
-    printf("%s%s", ESC, BLINKTEXT);
-}
-
-
-static inline void screenSetReverse()
-{
-    printf("%s%s", ESC, REVERSETEXT);
-}
-
-
-static inline void screenBoxEnable()
-{
-    printf("%s%s", ESC, BOX_ENABLE);
-}
-
-
-static inline void screenBoxDisable()
-{
-    printf("%s%s", ESC, BOX_DISABLE);
-}
-
-
-void screenInit(int drawBorders);
-
-void screenDestroy();
-
+void screenHomeCursor(void);
 void screenGotoxy(int x, int y);
-
+void screenBoxDisable(void);
+void screenUpdate(int erros);  
+void screenInit(int drawBorders);
+void screenDestroy();
 void screenSetColor(screenColor fg, screenColor bg);
+void screenTrofeu();
+void screenCaveira();
+void screenForca();
+
+#define BOX_CROSS '+'
 
 #endif 
+
