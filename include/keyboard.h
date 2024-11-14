@@ -1,13 +1,11 @@
-#ifndef __KEYBOARD_H__
-#define __KEYBOARD_H__
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
+#include <stdio.h>
+#include <unistd.h> 
 
-void keyboardInit();
+int keyhit(void);  
+char get_input(void);  
 
-void keyboardDestroy();
-    
-int keyhit();
+#endif
 
-int readch();
-
-#endif 
