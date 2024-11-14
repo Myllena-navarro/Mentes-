@@ -3,7 +3,7 @@
 CESAR School | Programação Imperativa e Funcional - 2024.2
 
 ## Descrição
-Mentes³ é um jogo da forca que desafia seu raciocínio lógico ao mesmo tempo que se diverte! Desenvolvido em C, o game é jogado no terminal, onde você tentará adivinhar as letras de palavras secretas. Para cada letra correta, você acumula pontos. No entanto, a cada letra errada, uma parte do corpo será mostrada e o jogo fica mais próximo de terminar. E daí GAME OVER. Será que você consegue desvendar todas as palavras e alcançar o máximo de pontos?
+Mentes³ é um jogo da forca que desafia seu raciocínio lógico ao mesmo tempo que se diverte! Desenvolvido em C, o game é jogado no terminal, onde você tentará adivinhar as letras de palavras secretas. Para cada letra correta, você acumula pontos. No entanto, a cada letra errada, uma parte do corpo será mostrada e o jogo fica mais próximo de terminar. E daí GAME OVER. Será que você consegue desvendar a palavra e alcançar o máximo de pontos?
 
 ## Time
 - Débora Buriti (@debburiti)
